@@ -10,6 +10,11 @@ const BAI5A = "moduleBAI5A(output[3:0]Q,inputclk,inputrst);reg[3:0]value;always@
 
 const BAI6A = "moduleBAI6A(inputwirex,inputwirerst,inputwireclk,outputregw);parameter[2:0]A=3'b000,B=3'b001,C=3'b010,D=3'b011,E=3'b100;reg[2:0]p_state,n_state;always@(xorp_state)begin:Transitionsn_statee=Acase(p_state)A:if(x==1'b1)n_state=B;elsenstate=A;B:if(x==1'b1)n_state=B;elsen_state=C;C:if(x==1'b1)n_state=Delsenstate=A;D:if(x==1'b1)n_state=E;elsen_state=C;E:if(x==1'b1)n_state=B;elsen_state=Cdefault:n_state=Aendcaseendalways@(xorp_state)begin:Outputingw=1'b0;w=(p_state==E);endalways@(posedgeclk)begin:Registeringif(~rst)p_state=Aelsep_state=n_state;endendmodulemoduleBAI6A_test(output[0:0]LEDG,input[0:0]sw,input[0:1]KEY);BAI6ADUT(.x(SW[0]),.clk(KEY[1]),.rst(KEY[0]),.w(LEDG[0]));endmodule"
 
+// switch
+const switchInputs = document.querySelectorAll('.switch-input')
+
+//led
+const ledOutput = document.querySelectorAll('.led')
 
 // Output of complie verilog code
 var output = document.getElementById('Output');
@@ -19,6 +24,60 @@ const textArea = document.getElementById("code");
 
 //Set variable for setInterval to computing I/O 
 var Io_computing;
+
+//save text from textarea
+document.getElementById('saveButton').addEventListener('click', function () {
+    // Get the text from the textarea
+    let textToSave = document.getElementById('code').value;
+
+    // Create a Blob with the text
+    let textBlob = new Blob([textToSave], { type: 'text/plain' });
+
+    // Create a link element
+    let downloadLink = document.createElement('a');
+
+    // Create a URL for the Blob and set it as the href attribute of the link
+    downloadLink.href = URL.createObjectURL(textBlob);
+
+    // Set the download attribute with a filename
+    downloadLink.download = 'verilog.txt';
+
+    // Append the link to the body (necessary for Firefox)
+    document.body.appendChild(downloadLink);
+
+    // Programmatically click the link to trigger the download
+    downloadLink.click();
+
+    // Remove the link from the document
+    document.body.removeChild(downloadLink);
+});
+
+//open a file 
+document.getElementById('openButton').addEventListener('click', function () {
+    // Programmatically click the hidden file input element
+    document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput').addEventListener('change', function (event) {
+    // Get the selected file
+    let file = event.target.files[0];
+
+    // Create a FileReader to read the file
+    let reader = new FileReader();
+
+    // Define the onload event handler
+    reader.onload = function (e) {
+        // Get the file content
+        let fileContent = e.target.result;
+
+        // Display the file content in the textarea
+        document.getElementById('code').value = fileContent;
+    };
+
+    // Read the file as text
+    reader.readAsText(file);
+});
+
 
 
 //function for line count
@@ -41,6 +100,7 @@ function updateLineCount() {
 }
 //function for run button
 function executeCommands() {
+    rst_All_variable()
     const regex = /module\s+(\w+)\s*\(/;
     const match = regex.exec(textArea.value);
 
@@ -53,7 +113,7 @@ function executeCommands() {
             complie_code(module_name);
         } else {
             output.innerHTML = "";
-            output.innerHTML = "The module name: " + module_name + " is not recognized";
+            output.innerHTML = 'The module name: ${module_name} is not recognized';
             return;
         }
     } else {
@@ -71,6 +131,7 @@ function complie_code(module_name) {
     const lines_with_whitespace = textArea.value.split('\n');
     const lines = textArea.value.replace(/ /g, '').split('\n');
     //BAI1
+
     if (module_name == "BAI1") {
 
         for (let i = 0; i < lines.length; i++) {
@@ -83,19 +144,28 @@ function complie_code(module_name) {
                 if (char !== BAI1[count]) {
 
                     output.innerHTML = "";
-                    output.innerHTML = "Module name: " + module_name + ", Error near: " + char + ", " + "in line " + (i + 1) + " " + lines_with_whitespace[i]
+                    output.innerHTML = `Module name: ${module_name}<br>
+                    NameError: "${char}", in line ${i + 1}<br>
+                    ${lines_with_whitespace[i]}`
                     return;
                 }
                 count++;
             }
         }
+        if (count < BAI1.length) {
+            output.innerHTML = "";
+            output.innerHTML = `Module name: ${module_name}<br>
+                        Expected  "${BAI1[count]}" at the end <br>
+                        `
+            return;
+        }
 
         output.innerHTML = "";
-        output.innerHTML = "Compile successfully module " + module_name
+        output.innerHTML = `Compile successfully module "${module_name}"`
         // after 0.1s call function to computing output
         Io_computing = setInterval(function () { verilog(module_name) }, 100)
     }
-    //BAI2A 
+        //BAI2A 
     else if (module_name == "BAI2A") {
         for (let i = 0; i < lines.length; i++) {
             const currentLine = lines[i];
@@ -107,18 +177,27 @@ function complie_code(module_name) {
                 if (char !== BAI2A[count]) {
 
                     output.innerHTML = "";
-                    output.innerHTML = "Module name: " + module_name + ", Error near: " + char + ", " + "in line " + (i + 1) + " " + lines_with_whitespace[i]
+                    output.innerHTML = `Module name: ${module_name}<br>
+                    NameError: "${char}", in line ${i + 1}<br>
+                    ${lines_with_whitespace[i]}`
                     return;
                 }
                 count++;
             }
         }
+        if (count < BAI2A.length) {
+            output.innerHTML = "";
+            output.innerHTML = `Module name: ${module_name}<br>
+                        Expected  "${BAI2A[count]}" at the end <br>
+                        `
+            return;
+        }
         output.innerHTML = "";
-        output.innerHTML = "Compile successfully module " +  module_name
+        output.innerHTML = `Compile successfully module "${module_name}"`
         // after 0.1s call function to computing output
         Io_computing = setInterval(function () { verilog(module_name) }, 100)
     }
-    //BAI3A
+        //BAI3A
     else if (module_name == "BAI3A") {
         for (let i = 0; i < lines.length; i++) {
             const currentLine = lines[i];
@@ -130,18 +209,27 @@ function complie_code(module_name) {
                 if (char !== BAI3A[count]) {
 
                     output.innerHTML = "";
-                    output.innerHTML = "Module name: " + module_name + ", Error near: " + char + ", " + "in line " + (i + 1) + " " + lines_with_whitespace[i]
+                    output.innerHTML = `Module name: ${module_name}<br>
+                    NameError: "${char}", in line ${i + 1}<br>
+                    ${lines_with_whitespace[i]}`
                     return;
                 }
                 count++;
             }
         }
+        if (count < BAI3A.length) {
+            output.innerHTML = "";
+            output.innerHTML = `Module name: ${module_name}<br>
+                        Expected  "${BAI3A[count]}" at the end <br>
+                        `
+            return;
+        }
         output.innerHTML = "";
-        output.innerHTML = "Compile successfully module " + module_name
+        output.innerHTML = `Compile successfully module "${module_name}"`
         // after 0.1s call function to computing output
         Io_computing = setInterval(function () { verilog(module_name) }, 100)
     }
-    //BAI4A
+        //BAI4A
     else if (module_name == "BAI4A") {
         for (let i = 0; i < lines.length; i++) {
             const currentLine = lines[i];
@@ -153,18 +241,27 @@ function complie_code(module_name) {
                 if (char !== BAI4A[count]) {
 
                     output.innerHTML = "";
-                    output.innerHTML = "Module name: " + module_name + ", Error near: " + char + ", " + "in line " + (i + 1) + " " + lines_with_whitespace[i]
+                    output.innerHTML = `Module name: ${module_name}<br>
+                    NameError: "${char}", in line ${i + 1}<br>
+                    ${lines_with_whitespace[i]}`
                     return;
                 }
                 count++;
             }
         }
+        if (count < BAI4A.length) {
+            output.innerHTML = "";
+            output.innerHTML = `Module name: ${module_name}<br>
+                        Expected  "${BAI4A[count]}" at the end <br>
+                        `
+            return;
+        }
         output.innerHTML = "";
-        output.innerHTML = "Compile successfully module " + module_name
+        output.innerHTML = `Compile successfully module "${module_name}"`
         // after 0.1s call function to computing output
         Io_computing = setInterval(function () { verilog(module_name) }, 100)
     }
-    //BAI5A
+        //BAI5A
     else if (module_name == "BAI5A") {
         for (let i = 0; i < lines.length; i++) {
             const currentLine = lines[i];
@@ -176,18 +273,27 @@ function complie_code(module_name) {
                 if (char !== BAI5A[count]) {
 
                     output.innerHTML = "";
-                    output.innerHTML = "Module name: " + module_name + ", Error near: " + char + ", " + "in line " + (i + 1) + " " + lines_with_whitespace[i]
+                    output.innerHTML = `Module name: ${module_name}<br>
+                    NameError: "${char}", in line ${i + 1}<br>
+                    ${lines_with_whitespace[i]}`
                     return;
                 }
                 count++;
             }
         }
+        if (count < BAI5A.length) {
+            output.innerHTML = "";
+            output.innerHTML = `Module name: ${module_name}<br>
+                        Expected  "${BAI5A[count]}" at the end <br>
+                        `
+            return;
+        }
         output.innerHTML = "";
-        output.innerHTML = "Compile successfully module " + module_name
+        output.innerHTML = `Compile successfully module "${module_name}"`
         // after 0.1s call function to computing output
         Io_computing = setInterval(function () { verilog(module_name) }, 100)
     }
-    //BAI6A
+        //BAI6A
     else if (module_name == "BAI6A") {
         for (let i = 0; i < lines.length; i++) {
             const currentLine = lines[i];
@@ -199,14 +305,23 @@ function complie_code(module_name) {
                 if (char !== BAI6A[count]) {
 
                     output.innerHTML = "";
-                    output.innerHTML = "Module name: " + module_name + ", Error near: " + char + ", " + "in line " + (i + 1) + " " + lines_with_whitespace[i]
+                    output.innerHTML = `Module name: ${module_name}<br>
+                    NameError: "${char}", in line ${i + 1}<br>
+                    ${lines_with_whitespace[i]}`
                     return;
                 }
                 count++;
             }
         }
+        if (count < BAI6A.length) {
+            output.innerHTML = "";
+            output.innerHTML = `Module name: ${module_name}<br>
+                        Expected  "${BAI6A[count]}" at the end <br>
+                        `
+            return;
+        }
         output.innerHTML = "";
-        output.innerHTML = "Compile successfully module " + module_name
+        output.innerHTML = `Compile successfully module "${module_name}"`
         // after 0.1s call function to computing output
         Io_computing = setInterval(function () { verilog(module_name) }, 100)
 
@@ -259,14 +374,10 @@ document.addEventListener("keyup", function (event) {
 });
 
 
-// switch
-const switchInputs = document.querySelectorAll('.switch-input')
 
-//led
-const ledOutput = document.querySelectorAll('.led')
 
 //sign from switch
-var switch_input = [];
+let switch_input = [];
 
 
 //--------------------------------------------------------------------------------------------//
@@ -298,6 +409,12 @@ function rst_All_variable() {
     n_state = 0
     pre_clk_BAI6A = 0;
     w = 0
+    for (let i = 0; i < switchInputs.length; i++) {
+        switchInputs[i].checked = false;
+    }
+    for (let i = 0; i < ledOutput.length; i++) {
+        ledOutput[i].classList.remove["active_led"];
+    }
 }
 //-------------------------------------------------------------------------------------------//
 //object A
