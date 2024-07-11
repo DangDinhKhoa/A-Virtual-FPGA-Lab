@@ -9,7 +9,7 @@ phòng thí nghiệm đại học điển hình như cổng AND, mux, bộ mã h
 không cần phòng thí nghiệm và học thiết kế IC miễn phí cho bất kỳ ai ở bất kỳ đâu và bất kỳ lúc nào. Các nhu cầu, yêu cầu, kiến trúc, triển khai và trường hợp sử dụng của 
 hệ thống FPGA ảo được nghiên cứu và trình bày. Ứng dụng này là mã nguồn mở trên GitHub.
 </br>
-<a href="https://www.youtube.com/watch?v=z-P2tgsCf-o" target="_blank"><h3>Video demo</h3></a>
+<a href="https://youtu.be/z-P2tgsCf-o?si=hTQa8TL97sMyHyaJ" target="_blank"><h3>Video demo</h3></a>
 </br>
 </br>
 <h3><b>Hướng dẫn sử dụng</b></h3>
